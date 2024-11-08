@@ -9,9 +9,10 @@ Converts Hook attributes from Hux module to Drupal core.
  * [ ] Other hux attributes
 
 Core expects hooks to exist in the `Hook` namespace, but hux expects `Hooks`.
-The rector does not yet update the namespace. If hux is still required, such as
-to support Alter hooks, hux will need to be configured to look at the core
-namespace.
+The rector does not move the class, but it does change the namespace. If hux is
+still required, such as to support Alter hooks, hux will need to be configured
+to look at the core namespace. Once the rector is complete, classes must be
+moved to the correct directory.
 
 ## Usage
 

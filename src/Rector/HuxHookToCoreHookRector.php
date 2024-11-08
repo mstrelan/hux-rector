@@ -39,6 +39,7 @@ CODE_SAMPLE
         return [
           Node\Stmt\Use_::class,
           Node\Stmt\ClassMethod::class,
+          Node\Stmt\Namespace_::class,
         ];
     }
 
@@ -70,6 +71,16 @@ CODE_SAMPLE
             return $node;
           }
         }
+      }
+
+      if ($node instanceof Node\Stmt\Namespace_) {
+        $parts = $node->name->getParts();
+        if (count($parts) === 3 && $parts[0] === 'Drupal' && $parts[2] === 'Hooks') {
+          $node->name = new Node\Name(['Drupal', $parts[1], 'Hook']);
+          return $node;
+        }
+
+        return null;
       }
 
       return null;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Rector\Tests\TypeDeclaration\Rector\HuxHookToCoreHookRector\Fixture;
+namespace Drupal\node\Hooks;
 
 use Drupal\hux\Attribute\Hook;
 
@@ -53,7 +53,7 @@ class NodeHooks {
 -----
 <?php
 
-namespace Rector\Tests\TypeDeclaration\Rector\HuxHookToCoreHookRector\Fixture;
+namespace Drupal\node\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
 

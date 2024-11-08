@@ -1,6 +1,6 @@
 <?php
 
-namespace Rector\Tests\TypeDeclaration\Rector\HuxHookToCoreHookRector\Fixture;
+namespace Drupal\node\Hooks;
 
 /**
  * Hook implementations for node.
@@ -19,7 +19,7 @@ class NodeHooks {
 -----
 <?php
 
-namespace Rector\Tests\TypeDeclaration\Rector\HuxHookToCoreHookRector\Fixture;
+namespace Drupal\node\Hook;
 
 /**
  * Hook implementations for node.
