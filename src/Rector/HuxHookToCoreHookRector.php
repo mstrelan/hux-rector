@@ -6,9 +6,6 @@ namespace Utils\Rector\Rector;
 
 use PhpParser\Node;
 use PhpParser\Node\Attribute;
-use PhpParser\Node\AttributeGroup;
-use PhpParser\Node\Stmt\Class_;
-use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Scalar\String_;
 use Rector\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -40,23 +37,43 @@ CODE_SAMPLE
      */
     public function getNodeTypes(): array
     {
-        return [ClassMethod::class];
+        return [
+          Node\Stmt\Use_::class,
+          Node\Stmt\ClassMethod::class,
+        ];
     }
 
     /**
-     * @param ClassMethod $node
+     * @param Node\Stmt\ClassMethod $node
      */
     public function refactor(Node $node): ?Node
     {
+      if ($node instanceof Node\Stmt\ClassMethod) {
+        $changed = false;
         foreach ($node->getAttrGroups() as $attributeGroup) {
-            foreach ($attributeGroup->attrs as $attribute) {
-                if (!$this->shouldSkip($attribute)) {
-                    $attribute->name = new Node\Name('\\' . Hook::class);
-                }
+          foreach ($attributeGroup->attrs as $attribute) {
+            if (!$this->shouldSkip($attribute)) {
+              $changed = true;
+              $attribute->name = new Node\Name('Hook');
             }
+          }
         }
+        if ($changed) {
+          return $node;
+        }
+        return null;
+      }
 
-        return $node;
+      if ($node instanceof Node\Stmt\Use_) {
+        foreach ($node->uses as $use) {
+          if ($this->isName($use, HuxHook::class)) {
+            $use->name = new Node\Name(Hook::class);
+            return $node;
+          }
+        }
+      }
+
+      return null;
     }
 
     private function shouldSkip(Attribute $attribute): bool

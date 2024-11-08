@@ -23,7 +23,7 @@ class NodeHooks {
 
 namespace Rector\Tests\TypeDeclaration\Rector\HuxHookToCoreHookRector\Fixture;
 
-use Drupal\hux\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Hook implementations for node.
@@ -33,7 +33,7 @@ class NodeHooks {
   /**
    * Implements hook_cron().
    */
-  #[\Drupal\Core\Hook\Attribute\Hook('cron')]
+  #[Hook('cron')]
   public function cron(): void { }
 
 }
