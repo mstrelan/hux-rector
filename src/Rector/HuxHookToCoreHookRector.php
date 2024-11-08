@@ -6,7 +6,6 @@ namespace Utils\Rector\Rector;
 
 use PhpParser\Node;
 use PhpParser\Node\Attribute;
-use PhpParser\Node\Scalar\String_;
 use Rector\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
@@ -78,7 +77,10 @@ CODE_SAMPLE
 
     private function refactorAttribute(Attribute $attribute): void
     {
-        $attribute->name = new Node\Name('Hook');
+        $isFullyQualified = $attribute->name->getAttribute('originalName') instanceof Node\Name\FullyQualified;
+        $attribute->name = $isFullyQualified
+         ? new Node\Name\FullyQualified(Hook::class)
+         : new Node\Name('Hook');
         foreach ($attribute->args as $position => $arg) {
           $name = $arg->name;
           if ($name === null) {
