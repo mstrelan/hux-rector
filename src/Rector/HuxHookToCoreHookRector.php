@@ -5,25 +5,31 @@ declare(strict_types=1);
 namespace Utils\Rector\Rector;
 
 use PhpParser\Node;
+use PhpParser\Node\Attribute;
+use PhpParser\Node\AttributeGroup;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Scalar\String_;
 use Rector\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
 use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\hux\Attribute\Hook as HuxHook;
 
-/**
- * @see \Rector\Tests\TypeDeclaration\Rector\HuxHookToCoreHookRector\HuxHookToCoreHookRectorTest
- */
 final class HuxHookToCoreHookRector extends AbstractRector
 {
     public function getRuleDefinition(): RuleDefinition
     {
-        return new RuleDefinition('// @todo fill the description', [
+        return new RuleDefinition('Migrate HuxHook attribute to Core Hook attribute', [
             new CodeSample(
                 <<<'CODE_SAMPLE'
-// @todo fill code before
+#[\Drupal\hux\Attribute\Hook('cron')]
+public function cron(): void { }
 CODE_SAMPLE
                 ,
                 <<<'CODE_SAMPLE'
-// @todo fill code after
+#[\Drupal\Core\Hook\Attribute\Hook('cron')]
+public function cron(): void { }
 CODE_SAMPLE
             ),
         ]);
@@ -34,17 +40,35 @@ CODE_SAMPLE
      */
     public function getNodeTypes(): array
     {
-        // @todo select node type
-        return [\PhpParser\Node\Stmt\Class_::class];
+        return [ClassMethod::class];
     }
 
     /**
-     * @param \PhpParser\Node\Stmt\Class_ $node
+     * @param ClassMethod $node
      */
     public function refactor(Node $node): ?Node
     {
-        // @todo change the node
+        foreach ($node->getAttrGroups() as $attributeGroup) {
+            foreach ($attributeGroup->attrs as $attribute) {
+                if (!$this->shouldSkip($attribute)) {
+                    $attribute->name = new Node\Name('\\' . Hook::class);
+                }
+            }
+        }
 
         return $node;
+    }
+
+    private function shouldSkip(Attribute $attribute): bool
+    {
+        if (!$this->isName($attribute, HuxHook::class)) {
+            return true;
+        }
+
+        if (count($attribute->args) !== 1 || !$attribute->args[0]->value instanceof String_) {
+            return true;
+        }
+
+        return false;
     }
 }

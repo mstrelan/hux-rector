@@ -2,7 +2,20 @@
 
 namespace Rector\Tests\TypeDeclaration\Rector\HuxHookToCoreHookRector\Fixture;
 
-// @todo fill code before
+use Drupal\hux\Attribute\Hook;
+
+/**
+ * Hook implementations for node.
+ */
+class NodeHooks {
+
+  /**
+   * Implements hook_cron().
+   */
+  #[Hook('cron')]
+  public function cron(): void { }
+
+}
 
 ?>
 -----
@@ -10,6 +23,19 @@ namespace Rector\Tests\TypeDeclaration\Rector\HuxHookToCoreHookRector\Fixture;
 
 namespace Rector\Tests\TypeDeclaration\Rector\HuxHookToCoreHookRector\Fixture;
 
-// @todo fill code after
+use Drupal\hux\Attribute\Hook;
+
+/**
+ * Hook implementations for node.
+ */
+class NodeHooks {
+
+  /**
+   * Implements hook_cron().
+   */
+  #[\Drupal\Core\Hook\Attribute\Hook('cron')]
+  public function cron(): void { }
+
+}
 
 ?>
