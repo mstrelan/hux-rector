@@ -17,7 +17,7 @@ final class HuxHookToCoreHookRector extends AbstractRector
 {
     public function getRuleDefinition(): RuleDefinition
     {
-        return new RuleDefinition('Migrate HuxHook attribute to Core Hook attribute', [
+        return new RuleDefinition('Migrate Hux Hook attribute to Core Hook attribute', [
             new CodeSample(
                 <<<'CODE_SAMPLE'
 #[\Drupal\hux\Attribute\Hook('cron')]
@@ -54,7 +54,7 @@ CODE_SAMPLE
           foreach ($attributeGroup->attrs as $attribute) {
             if (!$this->shouldSkip($attribute)) {
               $changed = true;
-              $attribute->name = new Node\Name('Hook');
+              $this->refactorAttribute($attribute);
             }
           }
         }
@@ -76,13 +76,38 @@ CODE_SAMPLE
       return null;
     }
 
+    private function refactorAttribute(Attribute $attribute): void
+    {
+        $attribute->name = new Node\Name('Hook');
+        foreach ($attribute->args as $position => $arg) {
+          $name = $arg->name;
+          if ($name === null) {
+            $name = match ($position) {
+              0 => 'hook',
+              1 => 'moduleName',
+              2 => 'priority',
+              default => throw new \Exception('Invalid argument position'),
+            };
+            $arg->name = new Node\Identifier($name);
+          }
+        }
+      $newArgsOrder = ['hook', 'method', 'priority', 'moduleName'];
+      usort($attribute->args, function ($a, $b) use ($newArgsOrder) {
+        return array_search($a->name, $newArgsOrder) <=> array_search($b->name, $newArgsOrder);
+      });
+      foreach ($attribute->args as $arg) {
+        $arg->name = match ($arg->name->name) {
+          'hook' => null,
+          'moduleName' => new Node\Identifier('module'),
+          'priority' => new Node\Identifier('priority'),
+          default => throw new \Exception('Invalid argument name'),
+        };
+      }
+    }
+
     private function shouldSkip(Attribute $attribute): bool
     {
         if (!$this->isName($attribute, HuxHook::class)) {
-            return true;
-        }
-
-        if (count($attribute->args) !== 1 || !$attribute->args[0]->value instanceof String_) {
             return true;
         }
 
